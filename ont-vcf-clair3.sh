@@ -134,10 +134,6 @@ else
   CTG_ARGS=(--include_all_ctgs)
 fi
 
-CONDA_BASE="$(conda info --base)"
-source "
-conda activate clair3
-
 echo ">>> [Clair3] model=$MODEL"
 # assume the script is run inside the clair3 conda env
 run_clair3.sh \
@@ -166,8 +162,6 @@ VCF_GZ="$VCF_OUT_DIR/${SAMPLE}.clair3.vcf.gz"
 bcftools sort -T "$TMPDIR_RUN" -Ov "$VCF_RAW" \
   | bgzip -@ "$ST_THREADS" > "$VCF_GZ"
 tabix -f -@ "$ST_THREADS" -p vcf "$VCF_GZ"
-
-conda deactivate
 
 echo ">>> Done"
 echo "BAM : $BAM"
