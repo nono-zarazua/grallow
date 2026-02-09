@@ -1,0 +1,18 @@
+2026-02-09 17:32:07,479 NanoPlot 1.30.1 started with arguments Namespace(threads=4, verbose=False, store=False, raw=False, huge=False, outdir='qc/nanoplot/', prefix='_', maxlength=4000, minlength=None, drop_outliers=False, downsample=None, loglength=False, percentqual=False, alength=False, minqual=None, runtime_until=None, readtype='1D', barcoded=False, no_supplementary=False, color='#4CB391', colormap='Greens', format='png', plots=['kde', 'dot'], listcolors=False, listcolormaps=False, no_N50=False, N50=False, title=None, font_scale=1, dpi=100, hide_stats=False, fastq=None, fasta=None, fastq_rich=None, fastq_minimal=None, summary=None, bam=['B025-02_1.sorted.aligned.bam'], ubam=None, cram=None, pickle=None, path='qc/nanoplot/_')
+2026-02-09 17:32:07,479 Python version is: 3.14.3 | packaged by conda-forge | (main, Feb  5 2026, 05:49:06) [GCC 14.3.0]
+2026-02-09 17:32:07,493 NanoPlot:  valid output format png
+2026-02-09 17:37:08,644 Nanoget: Gathered all metrics of 2423980 reads
+2026-02-09 17:37:11,145 Calculated statistics
+2026-02-09 17:37:11,146 Using sequenced read lengths for plotting.
+2026-02-09 17:37:11,319 Hidding 281858 reads longer than 4000bp in length plots.
+2026-02-09 17:37:11,533 NanoPlot:  Valid color #4CB391.
+2026-02-09 17:37:11,533 module 'matplotlib.cm' has no attribute 'cmap_d'
+Traceback (most recent call last):
+  File "/home/ec2-user/miniconda3/envs/multi-nano/lib/python3.14/site-packages/nanoplot/NanoPlot.py", line 97, in main
+    plots = make_plots(datadf, settings)
+  File "/home/ec2-user/miniconda3/envs/multi-nano/lib/python3.14/site-packages/nanoplot/NanoPlot.py", line 134, in make_plots
+    colormap = nanoplotter.check_valid_colormap(settings["colormap"])
+  File "/home/ec2-user/miniconda3/envs/multi-nano/lib/python3.14/site-packages/nanoplotter/nanoplotter_main.py", line 65, in check_valid_colormap
+    if colormap in list(cm.cmap_d.keys()):
+                        ^^^^^^^^^
+AttributeError: module 'matplotlib.cm' has no attribute 'cmap_d'
