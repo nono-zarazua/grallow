@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ../utils.sh
+
 # --- CONFIGURATION ---
 WORKFLOW_ID="9388837"
 ROLE_ARN="arn:aws:iam::002313225286:role/HOMICS"
