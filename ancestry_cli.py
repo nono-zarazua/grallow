@@ -143,13 +143,13 @@ def main(argv):
             usage(argv)
             sys.exit(1)
 
-        if tsv_path:
-            valid_arguments["TSV"] = tsv_path
-        else:
-            valid_arguments["TSV"] = target_dir / "compiled_gsa_map.tsv"
-            print(f"Notice: No '--compile' path provided. Defaulting to '{valid_arguments['TSV']}'")
+        if not tsv_path:
+            valid_arguments["--compile"] = target_dir / "compiled_gsa_map.tsv"
+            print(f"Notice: No '--compile' path provided. Defaulting creation to '{valid_arguments['--compile']}'")
 
-    tsv_target_dir = valid_arguments["TSV"].parent
+        valid_arguments["TSV"] = None
+
+    tsv_target_dir = valid_arguments["--compile"].parent
     if str(tsv_target_dir) != ".":
         tsv_target_dir.mkdir(parents=True, exist_ok=True)
 
@@ -160,8 +160,3 @@ def main(argv):
 if __name__ == "__main__":
     argv = sys.argv
     arguments = main(argv)
-
-    if argv[1] == '--doi':
-        print(f"GO ID: {arguments['--doi']}, File: {arguments['FILE']}")
-    elif argv[1] == '--pubmed':
-        print(f"GO ID: {arguments['--pubmed']}, File: {arguments['FILE']}")

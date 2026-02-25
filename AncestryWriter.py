@@ -7,6 +7,7 @@ import os
 import csv
 import datetime
 from zoneinfo import ZoneInfo
+import ancestry_cli
 
 class AncestryWriter:
     # AncestryWriter format parser for vcf data
@@ -59,8 +60,7 @@ class AncestryWriter:
         print(f"Saving compiled reference to {self.compiled_tsv_path}...")
         with open(self.compiled_tsv_path, 'w') as f:
             f.write("rsid\tillumina_id\tchr\tposition\n")
-            for line in self.raw_snp_data:
-                f.write(line)
+            f.writelines(self.raw_snp_data)
         print("Permanent TSV reference created successfully!")
 
     def _load_rsid_translator(self):
@@ -248,19 +248,21 @@ rsid\tchromosome\tposition\tallele1\tallele2
 
 
 if __name__ == "__main__":
-    # We now require at least 3 arguments (VCF, TXT, Compiled_TSV) 
-    # and up to 5 if the compiled TSV doesn't exist yet!
-    if len(sys.argv) < 4:
-        print("Usage: python vcf_to_ancestry.py <input.vcf.gz> <output.txt> <compiled_map.tsv> [gsa_manifest.csv] [rsid_map.txt]")
-        sys.exit(1)
-        
-    vcf_in = sys.argv[1]
-    txt_out = sys.argv[2]
-    compiled_tsv = sys.argv[3]
+    argv = ancestry_cli.main(sys.argv)
     
-    # Safely handle the optional raw Illumina files
-    gsa_manifest = sys.argv[4] if len(sys.argv) >= 5 else None
-    rsid_map = sys.argv[5] if len(sys.argv) == 6 else None
-        
-    converter = AncestryWriter(vcf_in, txt_out, compiled_tsv, gsa_manifest, rsid_map)
+    vcf_path = argv["VCF"]
+    txt_path = argv["TXT"]
+    gsa_manifest_path = None
+    rsid_map_path = None
+
+    existing_compiled = False
+    if argv["TSV"]:
+        compiled_tsv_path = argv["TSV"]
+        existing_compiled = True
+    else:
+        compiled_tsv_path = argv["--compile"]
+        gsa_manifest_path = argv["--manifest"]
+        rsid_map_path = argv["--reference"]
+    
+    converter = AncestryWriter(vcf_path, txt_path, compiled_tsv_path, gsa_manifest_path, rsid_map_path)
     converter.convert()
