@@ -1,5 +1,79 @@
 #!/bin/sh
 
+function doc2odt {
+    if [ -z $1 ]; then
+        echo "Usage: doc2odt folder"
+    else
+        owd=`pwd`
+        cd $1
+        libreoffice --headless --convert-to odt *.doc*
+        cd $owd
+   fi
+}   
+
+function Rdoc {
+    if [ -f $1 ]; then 
+        Rscript -e "cat(tools::Rd2txt('$1'),file=stdout());"
+    elif [ -z $2 ]; then
+        Rscript -e "help($1)"
+    else
+        Rscript -e "library($1); help($2);"    
+    fi
+}
+
+function rgb2hex {
+    if [ -z $3 ]; then
+        echo "Usage: rgb2hex R G B"
+    else 
+        hex=`printf "#%02x%02x%02x\n" $1 $2 $3`
+        printf "$1 $2 $3 == $hex "
+        printf "  \033[48;2;%d;%d;%dm           \033[0m " $1 $2 $3
+        printf "  \033[38;2;%d;%d;%dmHello World\033[0m\n" $1 $2 $3
+    fi
+}
+
+function colors-16 { 
+    printf "\n   "
+    for c in {0..15};
+    do
+        printf "\033[48;5;%sm %3d \033[0m" "$c" $((c+1)); #)
+        if (( c == 7 )); then
+            printf "\n   ";
+        fi;
+    done
+    printf "\n\n";
+    
+    printf "\n   "
+    for c in {0..15};
+    do
+        printf "\033[38;5;%sm %3d \033[0m" "$c" "$c";
+        if (( c == 7 )); then
+            printf "\n   ";
+        fi;
+    done
+    printf "\n\n";
+}
+
+function curl-cheat {
+    curl cheat.sh/$1
+}
+function colors-show {
+    for c in {0..255}; do     
+        printf "\033[48;5;%sm%3d\033[0m " "$c" "$c";     
+        if (( c == 15 )) || (( c > 15 )) && (( (c-15) % 16 == 0 )); then
+            printf "\n";
+        fi; 
+    done
+}
+
+function curl-weather {
+    if [ -z $1 ]; then
+        curl wttr.in/Potsdam
+    else
+        curl wttr.in/$1
+    fi
+}
+
 function substring () {
     if [[ -z $2 ]]; then
         echo "Usage: substring string start [end]"
