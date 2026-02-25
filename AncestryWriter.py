@@ -143,8 +143,19 @@ class AncestryWriter:
             file_obj = open(filename, 'r')
             return file_obj, filename
 
-    def process_genotype(self, ref, alt_string, gt_string):
+    def process_genotype(self, ref, alt_string, gt_string, gp_string=None, min_confidence=0.90):
         """Converts VCF GT (e.g., 0|1) to actual DNA letters."""
+
+        if gp_string and min_confidence > 0:
+            try:
+                # Convert "0.05,0.90,0.05" -> [0.05, 0.90, 0.05]
+                gp_probs = [float(p) for p in gp_string.split(',')]
+
+                if max(gp_probs) < min_confidence:
+                    return "0", "0"
+            except ValueError:
+                return "0", "0"
+
         alleles = [ref] + alt_string.split(',')
         gt_clean = gt_string.replace('|', '/').split('/')
 
@@ -225,7 +236,11 @@ rsid\tchromosome\tposition\tallele1\tallele2
                 if "GT" not in format_keys: continue
                 gt_string = sample_data[format_keys.index("GT")]
 
-                allele1, allele2 = self.process_genotype(ref, alt, gt_string)
+                gp_string = None
+                if "GP" in format_keys:
+                    gp_string = sample_data[format_keys.index("GP")]
+
+                allele1, allele2 = self.process_genotype(ref, alt, gt_string, gp_string, min_confidence=0.90)
                 out.write(f"{final_rsid}\t{mapped_chrom}\t{pos}\t{allele1}\t{allele2}\n")
                 variants_written += 1
         
