@@ -130,6 +130,7 @@ class AncestryWriter:
 
     def _open_file(self, filename):
         """Opens a file and returns the file object along with its uncompressed filename."""
+        filename = str(filename)
         if not os.path.exists(filename):
             raise FileNotFoundError(f"File '{filename}' not found.")
 
