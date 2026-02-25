@@ -4,7 +4,7 @@
 # This script is solely for the purpose of establishing the console app and checking arguments
 """
 $ python3 ancestry-cli.py
-Usage: zarazuanav_exam_a.py --help | VCF | OUTPUT.txt | COMPILED.tsv [--manifest MANIFEST.csv | --reference REF.csv]
+Usage: ancestry-cli.py VCF | OUTPUT.txt | COMPILED.tsv [--help |--manifest MANIFEST.csv | --reference REF.csv]
 GSA-1 parser for imputation data by Roberto Zarazuanav, 2026.
 Output an Ancestry-like .tsv using data derived from QUILT2 for lcWGS and using Illumina GSA-1 manifest as reference.
 -----------------------------------------------
@@ -28,7 +28,7 @@ import re
 
 def usage(argv):
     """Show the usage line."""
-    print(f"Usage: {argv[0]} --help | VCF | OUTPUT.txt | COMPILED.tsv [--manifest MANIFEST.csv | --reference REF.csv]")
+    print(f"Usage: {argv[0]} VCF | OUTPUT.txt | COMPILED.tsv [--help | --manifest MANIFEST.csv | --reference REF.csv]")
 
 
 def mhelp(argv):
@@ -50,6 +50,9 @@ def main(argv):
     valid = ["--manifest","--reference"]
     # Initialize dictionary to store arguments
     valid_arguments = {
+        "VCF": "",
+        "TXT": "",
+        "TSV": "",
         "--manifest": "",
         "--reference": ""
     }
@@ -58,9 +61,20 @@ def main(argv):
         print(f"Inocrrect number of arguments {len(argv)}.")
         usage(argv)
         sys.exit(1)
+    elif not re.search(r"\.vcf(?:\.gz)?$", argv[1]):
+        print(f"Invalid input VCF: {argv[1]} (supported formats: '.vcf', '.vcf.gz'")
+        usage(argv)
+        sys.exit(1)
+    elif not os.path.isfile(argv[1]):
+        print(f"Error: The file '{argv[1]}' does not exist!")
+        sys.exit(1)
+    elif True:#TODO:Aqui vas
     else:
+        i = 3
+        while i < len(argv):
+            val = argv[i+1]
+            if argv[i] = "--manifest":
 
-        #TODO: Aqui vas
         # Validate file extension
         for filename in input_files:
             if not re.search(r"\.dat(?:\.gz)?$", filename):
