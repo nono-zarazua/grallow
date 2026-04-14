@@ -1,31 +1,52 @@
-process RUN_QC {
+process MOSDEPTH {
     tag "$meta_id"
-    label 'process_medium'
-    publishDir "${params.outdir}/qc", mode: 'copy'
+    label 'process_low'
+    publishDir "${params.outdir}/qc/mosdepth", mode: 'copy'
 
     input:
-    // Takes the output directly from REHEADER_BAM.out.bam
     tuple val(meta_id), path(bam), path(bai)
 
     output:
-    tuple val(meta_id), path("mosdepth/*"), emit: mosdepth_results
-    tuple val(meta_id), path("flagstat/*.flagstat"), emit: flagstat_results
-    tuple val(meta_id), path("nanoplot/*"), emit: nanoplot_results
+    tuple val(meta_id), path("${meta_id}*"), emit: results
 
     script:
     """
-    # Create output directories to keep results organized
-    mkdir -p mosdepth flagstat nanoplot
+    mosdepth -n -x "${meta_id}" ${bam}
+    """
+}
 
-    # 1. Mosdepth (Coverage stats)
-    mosdepth -n -x "mosdepth/${meta_id}" ${bam}
-    
-    # 2. Samtools Flagstat (Alignment/mapping rates)
-    samtools flagstat ${bam} > "flagstat/${meta_id}.flagstat"
+process FLAGSTAT {
+    tag "$meta_id"
+    label 'process_low'
+    publishDir "${params.outdir}/qc/flagstat", mode: 'copy'
 
-    # 3. NanoPlot (Read length and quality distributions)
+    input:
+    tuple val(meta_id), path(bam), path(bai)
+
+    output:
+    tuple val(meta_id), path("${meta_id}.flagstat"), emit: results
+
+    script:
+    """
+    samtools flagstat ${bam} > "${meta_id}.flagstat"
+    """
+}
+
+process NANOPLOT {
+    tag "$meta_id"
+    label 'process_medium'
+    publishDir "${params.outdir}/qc/nanoplot", mode: 'copy'
+
+    input:
+    tuple val(meta_id), path(bam), path(bai)
+
+    output:
+    tuple val(meta_id), path("${meta_id}_*"), emit: results
+
+    script:
+    """
     NanoPlot --bam ${bam} \\
-             --outdir nanoplot \\
+             --outdir . \\
              --maxlength 4000 \\
              --no_static \\
              -p "${meta_id}_"
