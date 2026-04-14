@@ -1,0 +1,1 @@
+2026-04-14 15:43:45	1m 7s	silly_bell	OK	ad17cc54d7c89d8673259bcecb68a919	2e191adc-a52f-4394-bd22-a4cd156ad869	nextflow run main.nf -profile local

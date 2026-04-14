@@ -20,7 +20,7 @@ S3_INPUT_ROOT="s3://omics-data-002313225286/clients/gtria/prod/inputs"
 S3_OUTPUT_ROOT="s3://omics-data-002313225286/clients/gtria/prod/outputs"
 EC_OUTPUT_ROOT="/home/ec2-user/workdir/project-quilt-workdir/data/bams"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOMALIER_SITES="${SCRIPT_DIR}/sites.hg38.vcf.gz"  
+SOMALIER_SITES="/home/ec2-user/workdir/project-quilt-workdir/data/sites/sites.hg38.vcf.gz"  
 FASTA_REF="/home/ec2-user/workdir/project-quilt-workdir/data/ref/GRCh38_chr.fa"
 
 # Config files
