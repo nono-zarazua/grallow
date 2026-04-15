@@ -1,8 +1,0 @@
-2026-04-14 15:43:45	1m 7s	silly_bell	OK	ad17cc54d7c89d8673259bcecb68a919	2e191adc-a52f-4394-bd22-a4cd156ad869	nextflow run main.nf -profile local
-2026-04-14 16:33:25	45.4s	romantic_swartz	ERR	7059ce7d92637fe684af6e339f67b277	3ec9496b-d78c-4dcc-8efd-3368cb7e7179	nextflow run main.nf -profile local
-2026-04-14 16:37:32	5m 32s	pensive_ritchie	OK	4406a790b763657b35e64b3684394625	6560e24c-11d1-4c29-b5b1-5e472b5a142a	nextflow run main.nf -profile local
-2026-04-14 16:56:35	5m 24s	elegant_poisson	OK	1d061938aad3fca99151d58dd8a5a191	792025d1-adee-40cf-b787-c72b1951fdda	nextflow run main.nf -profile local
-2026-04-14 17:04:23	6m 21s	naughty_blackwell	OK	1d061938aad3fca99151d58dd8a5a191	031ba416-6a2f-4daf-b69c-3d2ca87dd4b8	nextflow run main.nf -profile local
-2026-04-15 10:24:01	-	curious_curry	-	73ece9a0a97448c4f0fedc265a546077	081b2ddc-90d5-469b-bfaa-2d2e32be83a5	nextflow run main.nf -profile local
-2026-04-15 10:26:00	-	grave_khorana	-	7bb8b29ba7e8944ee90ef037ef344fc1	8d410a33-3e27-4c86-821a-3f7be4d5de32	nextflow run main.nf -profile local
-2026-04-15 10:28:51	-	mad_faraday	-	7bb8b29ba7e8944ee90ef037ef344fc1	6e203a98-dd27-4187-887d-c8c651bf8662	nextflow run main.nf -profile local
