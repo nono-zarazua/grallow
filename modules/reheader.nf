@@ -8,8 +8,7 @@ process REHEADER_BAM {
     tuple val(meta_id), path(bam)
 
     output:
-    tuple val(meta_id), path("${meta_id}.fixed.bam"), emit: bam
-    tuple val(meta_id), path("${meta_id}.fixed.bam.bai"), emit: bai
+    tuple val(meta_id), path("${meta_id}.fixed.bam"), path("${meta_id}.fixed.bam.bai"), emit: bam_bai
 
     script:
     """
