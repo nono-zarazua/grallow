@@ -1,8 +1,8 @@
 process REHEADER_BAM {
     tag "$meta_id"
-    label 'process_low'
+    label 'process_medium'
     // Moves results from the 'work' directory to your project folder 
-    publishDir "${params.outdir}/reheadered", mode: 'copy'
+    publishDir "${params.outdir}/reheadered/${params.batch}", mode: 'copy'
 
     input:
     tuple val(meta_id), path(bam)

@@ -1,19 +1,18 @@
 #!/bin/bash
 # Exit immediately if a command exits with a non-zero status
 set -e
+cd "$(dirname "$(readlink -f "$0")")"
 
-CONFIG_DIR="/home/ec2-user/workdir/project-quilt-workdir/config"
+CONFIG_DIR="config"
 SAMPLES_TSV="${CONFIG_DIR}/samples.tsv"
 SAMPLES_SEX_TSV="${CONFIG_DIR}/samples-sex.tsv"
 CONFIG_YAML="${CONFIG_DIR}/config.yaml"
-# This matches the root in your Nextflow params
-EC_OUTPUT_ROOT="/home/ec2-user/workdir/project-quilt-workdir/data/bams"
 
 echo "======================================================"
 echo " PHASE 1: PREPROCESSING & QC (NEXTFLOW) "
 echo "======================================================"
 # Run the Nextflow pipeline
-nextflow run main.nf -profile local
+nextflow run main.nf -profile local -resume
 
 echo ""
 echo "======================================================"
@@ -45,10 +44,10 @@ done
 
 echo "Updating config.yaml with run_name: ${OUTPUT_DIR_NAME}..."
 # This finds the line starting with run_name and replaces it
-sed -i 's/^run_name:.*/run_name: "'"${OUTPUT_DIR_NAME}"'"/' "$CONFIG_YAML"
+sed -i 's/^run_name:.*/run_name: "'"${RUN_NAME}"'"/' "$CONFIG_YAML"
 
 echo "Generating samples.tsv and samples-sex.tsv..."
-python3 /home/ec2-user/workdir/scripts/generate_snakemake_inputs.py \
+python3 /home/ec2-user/workdir/grallow/scripts/generate_snakemake_inputs.py \
     --qc-csv "${OUTPUT_DIR}/evaluation/qc_summary.csv" \
     --run-name "${OUTPUT_DIR_NAME}" \
     --out-samples "${SAMPLES_TSV}" \
@@ -60,7 +59,7 @@ echo " PHASE 3: IMPUTATION (SNAKEMAKE) "
 echo "======================================================"
 # Trigger the Snakemake workflow 
 # (Adjust cores and conda flags to match your exact environment)
-snakemake --use-conda --cores 16 -s Snakefile
+snakemake --cores all --sdm conda --keep-going --rerun-incomplete
 
 echo ""
 echo "======================================================"

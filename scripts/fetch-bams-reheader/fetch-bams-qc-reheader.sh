@@ -20,8 +20,8 @@ S3_INPUT_ROOT="s3://omics-data-002313225286/clients/gtria/prod/inputs"
 S3_OUTPUT_ROOT="s3://omics-data-002313225286/clients/gtria/prod/outputs"
 EC_OUTPUT_ROOT="/home/ec2-user/workdir/project-quilt-workdir/data/bams"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOMALIER_SITES="/home/ec2-user/workdir/project-quilt-workdir/data/sites/sites.hg38.vcf.gz"  
-FASTA_REF="/home/ec2-user/workdir/project-quilt-workdir/data/ref/GRCh38_chr.fa"
+SOMALIER_SITES="${SCRIPT_DIR}/sites.hg38.vcf.gz"  # <--- FIXED: Absolute path
+FASTA_REF="/home/ec2-user/workdir/project-quilt-workdir/data/ref/hg38.analysisSet.fa.gz"
 
 # Config files
 CONFIG_DIR="/home/ec2-user/workdir/project-quilt-workdir/config"
@@ -134,6 +134,8 @@ tail -n +2 "$INPUT_CSV" | csvextract "$RESULT_STRING" | while IFS=, read -r alia
 	echo "  -> Fixing header (adding 'chr')..."
 	bamrehead "$LOCAL_BAM" index
 	
+        #samtools index $LOCAL_BAM
+
 	# QC
 	echo "Running QC for $alias."
 
