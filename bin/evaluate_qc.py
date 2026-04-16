@@ -3,9 +3,12 @@ import sys
 import os
 import glob
 import pandas as pd
+import argparse
 
-RED = '\033[91m'
-GREEN = '\033[92m'
+BOLD = '\033[1m'
+CYAN = '\033[36m'
+GREEN = '\033[32m'
+RED = '\033[31m'
 RESET = '\033[0m'
 
 class QCParser:
@@ -65,12 +68,24 @@ class QCParser:
         bio_male = chrx_ratio < 0.8 and chry_ratio > 0.1
         bio_female = chrx_ratio >= 0.8 and chry_ratio <= 0.1
         
-        if declared_male and not bio_male:
-            return "Mismatch (Expected Male)"
-        if declared_female and not bio_female:
-            return "Mismatch (Expected Female)"
-            
-        return "Match"
+        inferred_sex = "M" if bio_male else "F" if bio_female else "U"
+
+        if declared_male:
+            if bio_male:
+                return "Match", inferred_sex
+            elif bio_female:
+                return "Mismatch (Expected Male)", inferred_sex
+            else:
+                return "Mismatch (Inconclusive)", inferred_sex
+
+        elif declared_female:
+            if bio_female:
+                return "Match", inferred_sex
+            elif bio_male:
+                return "Mismatch (Expected Female)", inferred_sex
+            else:
+                return "Mismatch (Inconclusive)", inferred_sex 
+        return "Unknown Declaration", inferred_sex
 
     def run(self, output_csv):
         # 1. Load MultiQC Data
@@ -93,8 +108,10 @@ class QCParser:
         final_data = []
         
         # Print header for terminal display
-        print(f"\n{'Sample':<12} | {'Status':<6} | {'Depth':<6} | {'Map %':<6} | {'N50':<6} | {'Mean Q':<6} | {'Sex Match':<20}")
-        print("-" * 80)
+        header_format = f"\n{'Sample':<12} | {'Status':<6} | {'Depth':<6} | {'Map %':<6} | {'N50':<6} | {'Mean Q':<6} | {'Real Sex':<6} | {'Sex Match':<20}"
+        print(f"\n{header_format}")
+        table_width = len(header_format) + 2
+        print("-" * table_width)
 
         # 2. Iterate through samples and apply logic
         for _, row in df.iterrows():
@@ -132,17 +149,20 @@ class QCParser:
                 
             # Evaluate Sex Check
             sex_status = self.evaluate_sex(s_id, x_ratio, y_ratio)
-            sex_str = sex_status
-            if "Mismatch" in sex_status:
-                reasons.append(f"Sex {sex_status}")
-                sex_str = f"{RED}{sex_status}{RESET}"
+            sex_str = sex_status[0]
+            sex_real = sex_status[1]
+            if "Mismatch" in sex_str or "Unknown" in sex_str:
+                reasons.append(f"Sex {sex_str}")
+                sex_str = f"{RED}{sex_str}{RESET}"
+                sex_real = f"{RED}{sex_real}{RESET}"
+
                 
             # Compile results
             status = "FAIL" if reasons else "PASS"
             status_str = f"{RED}FAIL{RESET}" if status == "FAIL" else f"{GREEN}PASS{RESET}"
 
             # Print the color-coded row to the terminal
-            print(f"{s_id:<12} | {status_str:<15} | {depth_str:<15} | {mapped_str:<15} | {n50_str:<15} | {q_str:<15} | {sex_str}")
+            print(f"{s_id:<12} | {status_str:<15} | {depth_str:<6} | {mapped_str:<6} | {n50_str:<6} | {q_str:<6} | {sex_real:<8} | {sex_str:<20}")
 
             final_data.append({
                 'sample_id': s_id,
@@ -151,7 +171,8 @@ class QCParser:
                 'mapped_rate': mapped,
                 'n50': n50,
                 'mean_q': q,
-                'sex_match': sex_status,
+                'inferred_sex': sex_real,
+                'sex_match': sex_str,
                 'fail_reasons': " | ".join(reasons)
 
             })
@@ -159,14 +180,34 @@ class QCParser:
         # 3. Save Report
         out_df = pd.DataFrame(final_data)
         out_df.to_csv(output_csv, index=False)
-        print("-" * 80)
+        print("-" * table_width)
         print(f"\nClean CSV report saved to: {output_csv}\n")
 
 # --- CLI Entry Point ---
-if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print("Usage: evaluate_qc.py <multiqc_general_stats.txt> <mosdepth_dir> <output_report.csv>")
+if __name__ == "__main__":
+    # 2. Setup the Parser
+    description = f"{BOLD}{GREEN}QC Evaluator:{RESET} Parses MultiQC and Mosdepth data."
+    usage = f"{BOLD}python3 %(prog)s{RESET} {CYAN}<multiqc_data.tsv>{RESET} {CYAN}<mosdepth_dir>{RESET} {CYAN}<output.csv>{RESET}"
+
+    parser = argparse.ArgumentParser(
+        description=description,
+        usage=usage,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+
+    # --- THE MISSING PART: CHECK FOR ARGUMENTS ---
+    # sys.argv[0] is the script name, so if len is 1, no args were passed
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
         sys.exit(1)
-        
-    parser = QCParser(multiqc_file=sys.argv[1], mosdepth_dir=sys.argv[2])
-    parser.run(output_csv=sys.argv[3])
+    # ---------------------------------------------
+
+    # If your script uses positional arguments via sys.argv[1], sys.argv[2], etc.
+    # instead of parser.add_argument, you need at least 4 args (script + 3 files)
+    if len(sys.argv) < 4:
+        print(f"{BOLD}Error:{RESET} Missing required positional arguments.")
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
+    evaluator = QCParser(sys.argv[1], sys.argv[2])
+    evaluator.run(sys.argv[3])

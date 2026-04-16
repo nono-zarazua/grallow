@@ -4,8 +4,7 @@ params.input_csv = "trial_samples.csv"
 params.outdir    = "results"
 
 include { REHEADER_BAM }                 from './modules/reheader'
-include { MOSDEPTH; FLAGSTAT; NANOPLOT; MULTIQC } from './modules/qc'
-
+include { MOSDEPTH; FLAGSTAT; NANOPLOT; MULTIQC; EVALUATE_QC } from './modules/qc'
 workflow {
     ch_bams = Channel.fromPath(params.input_csv)
         .splitCsv(header: true)
