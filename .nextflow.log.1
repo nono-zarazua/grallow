@@ -1,0 +1,185 @@
+Apr-20 21:49:30.472 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf -profile local -resume
+Apr-20 21:49:30.551 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.10.4
+Apr-20 21:49:30.580 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/ec2-user/.nextflow/plugins; core-plugins: nf-amazon@3.4.4,nf-azure@1.20.2,nf-cloudcache@0.5.0,nf-codecommit@0.5.0,nf-console@1.3.0,nf-google@1.23.5,nf-k8s@1.2.2,nf-tower@1.17.5,nf-wave@1.16.1
+Apr-20 21:49:30.620 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Apr-20 21:49:30.621 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Apr-20 21:49:30.623 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Apr-20 21:49:30.644 [main] DEBUG nextflow.util.RetryConfig - Missing nextflow session - using default retry config
+Apr-20 21:49:30.919 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Apr-20 21:49:30.954 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /home/ec2-user/workdir/grallow/nextflow.config
+Apr-20 21:49:30.958 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/ec2-user/workdir/grallow/nextflow.config
+Apr-20 21:49:30.986 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `local`
+Apr-20 21:49:31.534 [main] DEBUG nextflow.config.ConfigBuilder - Available config profiles: [cloud, local]
+Apr-20 21:49:31.544 [main] WARN  nextflow.config.ConfigBuilder - It appears you have never run this project before -- Option `-resume` is ignored
+Apr-20 21:49:31.559 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Apr-20 21:49:31.559 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Apr-20 21:49:31.587 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/ec2-user/.nextflow/secrets/store.json
+Apr-20 21:49:31.590 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@708f018e] - activable => nextflow.secret.LocalSecretsProvider@708f018e
+Apr-20 21:49:31.613 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Apr-20 21:49:31.637 [main] DEBUG nextflow.cli.CmdRun - Launching `main.nf` [stupefied_poisson] DSL2 - revision: 834fcdf710
+Apr-20 21:49:31.705 [main] DEBUG nextflow.Session - Session UUID: 64b8ba5f-3c3e-464f-96bf-73c54d3995a2
+Apr-20 21:49:31.705 [main] DEBUG nextflow.Session - Run name: stupefied_poisson
+Apr-20 21:49:31.706 [main] DEBUG nextflow.Session - Executor pool size: 8
+Apr-20 21:49:31.714 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Apr-20 21:49:31.719 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Apr-20 21:49:31.765 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.10.4 build 11173
+  Created: 10-02-2026 15:17 UTC 
+  System: Linux 6.1.158-178.288.amzn2023.x86_64
+  Runtime: Groovy 4.0.28 on OpenJDK 64-Bit Server VM 17.0.10+7
+  Encoding: UTF-8 (UTF-8)
+  Process: 14578@ip-172-31-34-63.ec2.internal [172.31.34.63]
+  CPUs: 8 - Mem: 15.2 GB (13.8 GB) - Swap: 0 (0)
+Apr-20 21:49:31.794 [main] DEBUG nextflow.Session - Work-dir: /home/ec2-user/workdir/grallow/work [xfs]
+Apr-20 21:49:31.821 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Apr-20 21:49:31.831 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Apr-20 21:49:31.834 [main] DEBUG nextflow.Session - Observer factory (v2): DefaultObserverFactory
+Apr-20 21:49:31.869 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Apr-20 21:49:31.879 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 9; maxThreads: 1000
+Apr-20 21:49:31.963 [main] DEBUG nextflow.Session - Session start
+Apr-20 21:49:32.179 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Apr-20 21:49:32.649 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_medium` matches labels `process_medium` for process with name REHEADER_BAM
+Apr-20 21:49:32.653 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:REHEADER_BAM|FLAGSTAT` matches process REHEADER_BAM
+Apr-20 21:49:32.656 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-20 21:49:32.656 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-20 21:49:32.665 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Apr-20 21:49:32.671 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=8; memory=15.2 GB; capacity=8; pollInterval=100ms; dumpInterval=5m
+Apr-20 21:49:32.674 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Apr-20 21:49:32.696 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'REHEADER_BAM': maxForks=0; fair=false; array=0
+Apr-20 21:49:32.728 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name MOSDEPTH
+Apr-20 21:49:32.729 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:MOSDEPTH` matches process MOSDEPTH
+Apr-20 21:49:32.730 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-20 21:49:32.730 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-20 21:49:32.731 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'MOSDEPTH': maxForks=0; fair=false; array=0
+Apr-20 21:49:32.736 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name FLAGSTAT
+Apr-20 21:49:32.736 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:REHEADER_BAM|FLAGSTAT` matches process FLAGSTAT
+Apr-20 21:49:32.737 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-20 21:49:32.737 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-20 21:49:32.738 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'FLAGSTAT': maxForks=0; fair=false; array=0
+Apr-20 21:49:32.744 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_high` matches labels `process_high` for process with name NANOPLOT
+Apr-20 21:49:32.745 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:NANOPLOT|MULTIQC` matches process NANOPLOT
+Apr-20 21:49:32.746 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-20 21:49:32.746 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-20 21:49:32.748 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'NANOPLOT': maxForks=2; fair=false; array=0
+Apr-20 21:49:32.771 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name MULTIQC
+Apr-20 21:49:32.772 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withName:NANOPLOT|MULTIQC` matches process MULTIQC
+Apr-20 21:49:32.773 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-20 21:49:32.774 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-20 21:49:32.775 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'MULTIQC': maxForks=0; fair=false; array=0
+Apr-20 21:49:32.783 [main] DEBUG n.script.dsl.ProcessConfigBuilder - Config settings `withLabel:process_low` matches labels `process_low` for process with name EVALUATE_QC
+Apr-20 21:49:32.785 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-20 21:49:32.785 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-20 21:49:32.786 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EVALUATE_QC': maxForks=0; fair=false; array=0
+Apr-20 21:49:32.789 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: MOSDEPTH, FLAGSTAT, REHEADER_BAM, MULTIQC, NANOPLOT, EVALUATE_QC
+Apr-20 21:49:32.793 [main] DEBUG nextflow.Session - Igniting dataflow network (7)
+Apr-20 21:49:32.798 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > REHEADER_BAM
+Apr-20 21:49:32.799 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > MOSDEPTH
+Apr-20 21:49:32.799 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > FLAGSTAT
+Apr-20 21:49:32.799 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPLOT
+Apr-20 21:49:32.799 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > MULTIQC
+Apr-20 21:49:32.799 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EVALUATE_QC
+Apr-20 21:49:32.800 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_ea60377e4ae985e7: /home/ec2-user/workdir/grallow/modules/reheader.nf
+  Script_2ae34049f0b17b7b: /home/ec2-user/workdir/grallow/main.nf
+  Script_11e7ca6aaa214884: /home/ec2-user/workdir/grallow/modules/qc.nf
+Apr-20 21:49:32.800 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Apr-20 21:49:32.800 [main] DEBUG nextflow.Session - Session await
+Apr-20 21:49:32.909 [Actor Thread 5] DEBUG nextflow.conda.CondaCache - conda found local env for environment=/home/ec2-user/miniconda3/envs/bstools; path=/home/ec2-user/miniconda3/envs/bstools
+Apr-20 21:49:32.915 [Actor Thread 8] DEBUG nextflow.util.HashBuilder - Unable to get file attributes file: /home/nono/Downloads/trial_bams/dos.bam -- Cause: java.nio.file.NoSuchFileException: /home/nono/Downloads/trial_bams/dos.bam
+Apr-20 21:49:32.915 [Actor Thread 7] DEBUG nextflow.util.HashBuilder - Unable to get file attributes file: /home/nono/Downloads/trial_bams/uno.bam -- Cause: java.nio.file.NoSuchFileException: /home/nono/Downloads/trial_bams/uno.bam
+Apr-20 21:49:32.984 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-20 21:49:32.988 [Task submitter] INFO  nextflow.Session - [73/9f9571] Submitted process > REHEADER_BAM (uno)
+Apr-20 21:49:32.999 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-20 21:49:33.000 [Task submitter] INFO  nextflow.Session - [c2/d75ec1] Submitted process > REHEADER_BAM (dos)
+Apr-20 21:49:34.146 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: REHEADER_BAM (uno); status: COMPLETED; exit: 1; error: -; workDir: /home/ec2-user/workdir/grallow/work/73/9f957132ed0f96f323872a5a082754]
+Apr-20 21:49:34.147 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=24; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Apr-20 21:49:34.150 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: REHEADER_BAM (dos); status: COMPLETED; exit: 1; error: -; workDir: /home/ec2-user/workdir/grallow/work/c2/d75ec1d60752f0c8336cf6c43f76da]
+Apr-20 21:49:34.158 [TaskFinalizer-1] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=REHEADER_BAM (uno); work-dir=/home/ec2-user/workdir/grallow/work/73/9f957132ed0f96f323872a5a082754
+  error [nextflow.exception.ProcessFailedException]: Process `REHEADER_BAM (uno)` terminated with an error exit status (1)
+Apr-20 21:49:34.178 [TaskFinalizer-1] ERROR nextflow.processor.TaskProcessor - Error executing process > 'REHEADER_BAM (uno)'
+
+Caused by:
+  Process `REHEADER_BAM (uno)` terminated with an error exit status (1)
+
+
+Command executed:
+
+  # Check if header already contains 'chr' [cite: 2]
+  if samtools view -H uno.bam | grep '^@SQ' | head -n 1 | grep -q 'SN:chr'; then
+      echo "Headers already standardized for uno. Linking original."
+      # Create a copy with the expected output name [cite: 2]
+      cp uno.bam uno.fixed.bam
+      samtools index uno.fixed.bam
+  else
+      echo "Fixing headers for uno..."
+      # Reheader logic using your sed patterns [cite: 3]
+      samtools reheader <( \
+          samtools view -H uno.bam | \
+          sed 's/SN:\([0-9XY]\)/SN:chr\1/g' | \
+          sed 's/SN:MT/SN:chrM/g' \
+      ) uno.bam > uno.fixed.bam
+      samtools index uno.fixed.bam
+  fi
+
+Command exit status:
+  1
+
+Command output:
+  Fixing headers for uno...
+
+Command error:
+  [E::hts_open_format] Failed to open file "uno.bam" : No such file or directory
+  samtools view: failed to open "uno.bam" for reading: No such file or directory
+  Fixing headers for uno...
+  [E::hts_open_format] Failed to open file "uno.bam" : No such file or directory
+  samtools view: failed to open "uno.bam" for reading: No such file or directory
+  [main_reheader] failed to read the header for '/dev/fd/63'.
+
+Work dir:
+  /home/ec2-user/workdir/grallow/work/73/9f957132ed0f96f323872a5a082754
+
+Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`
+Apr-20 21:49:34.181 [TaskFinalizer-2] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=REHEADER_BAM (dos); work-dir=/home/ec2-user/workdir/grallow/work/c2/d75ec1d60752f0c8336cf6c43f76da
+  error [nextflow.exception.ProcessFailedException]: Process `REHEADER_BAM (dos)` terminated with an error exit status (1)
+Apr-20 21:49:34.187 [TaskFinalizer-1] DEBUG nextflow.Session - Session aborted -- Cause: Process `REHEADER_BAM (uno)` terminated with an error exit status (1)
+Apr-20 21:49:34.189 [main] DEBUG nextflow.Session - Session await > all processes finished
+Apr-20 21:49:34.213 [TaskFinalizer-1] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=2; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=0ms; failedDuration=4.3s; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=2; peakCpus=4; peakMemory=4 GB; ]
+Apr-20 21:49:34.222 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Apr-20 21:49:34.222 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Apr-20 21:49:34.224 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=2; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=0ms; failedDuration=4.3s; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=2; peakCpus=4; peakMemory=4 GB; ]
+Apr-20 21:49:34.224 [TaskFinalizer-1] DEBUG nextflow.Session - null
+java.lang.InterruptedException: null
+	at java.base/java.lang.Object.wait(Native Method)
+	at java.base/java.lang.Thread.join(Thread.java:1313)
+	at java.base/java.lang.Thread.join(Thread.java:1381)
+	at nextflow.trace.AnsiLogObserver.onFlowComplete(AnsiLogObserver.groovy:520)
+	at nextflow.Session$_notifyFlowComplete_lambda39.doCall(Session.groovy:1121)
+	at nextflow.Session.notifyEvent(Session.groovy:1151)
+	at nextflow.Session.notifyFlowComplete(Session.groovy:1121)
+	at nextflow.Session.shutdown0(Session.groovy:779)
+	at nextflow.Session.abort(Session.groovy:834)
+	at nextflow.Session.fault(Session.groovy:796)
+	at nextflow.processor.TaskPollingMonitor.finalizeTask(TaskPollingMonitor.groovy:753)
+	at nextflow.processor.TaskPollingMonitor.safeFinalizeTask(TaskPollingMonitor.groovy:736)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:343)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:328)
+	at groovy.lang.MetaClassImpl.doInvokeMethod(MetaClassImpl.java:1339)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1094)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1007)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokePogoMethod(InvokerHelper.java:645)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokeMethod(InvokerHelper.java:628)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokeMethodSafe(InvokerHelper.java:82)
+	at nextflow.processor.TaskPollingMonitor$_checkTaskStatus_lambda8.doCall(TaskPollingMonitor.groovy:726)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Apr-20 21:49:34.399 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Apr-20 21:49:34.412 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

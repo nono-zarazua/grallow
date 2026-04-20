@@ -1,3 +1,2 @@
 sample_id,bam_path
-uno,/home/nono/Downloads/trial_bams/uno.bam
-dos,/home/nono/Downloads/trial_bams/dos.bam
+B007-04_1,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260310_2/B007-04_1.sorted.aligned.bam
