@@ -2,111 +2,114 @@
 
 import tkinter as tk
 from tkinter import messagebox
+import customtkinter as ctk
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import subprocess
 import os
 import re
+import pandas as pd
 import glob
+
+# Enable CustomTkinter to work with the Drag-and-Drop wrapper
+class Tk(TkinterDnD.Tk):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 class LabApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Grallow Local QC Tool")
-        self.root.geometry("500x400")
+        self.root.geometry("550x450")
 
-        self.label = tk.Label(root, text="Drag & Drop Batch Folder for QC", 
-                              pady=20, font=("Helvetica", 12, "bold"))
-        self.label.pack()
+        # UI Styling
+        self.label = ctk.CTkLabel(root, text="Grallow Lab QC Launcher", 
+                                  font=("Helvetica", 20, "bold"))
+        self.label.pack(pady=20)
 
-        # Fixed relief to "groove" to avoid TclError
-        self.drop_zone = tk.Label(root, text="\n\n[ DROP FOLDER HERE ]\n\n", 
-                                  bg="#f0f0f0", width=40, height=10,
-                                  relief="groove", bd=2)
-        self.drop_zone.pack(padx=20, pady=10)
+        self.drop_zone = ctk.CTkLabel(root, text="\n\n[ DROP FOLDER HERE ]\n\n", 
+                                      width=400, height=200, fg_color="#333333",
+                                      corner_radius=10)
+        self.drop_zone.pack(padx=20, pady=20)
 
+        # FIX: Register and Bind using the correct methods
         self.drop_zone.drop_target_register(DND_FILES)
         self.drop_zone.dnd_bind('<<Drop>>', self.process_files)
 
-        self.status = tk.Label(root, text="Ready to run QC", fg="green")
+        self.status = ctk.CTkLabel(root, text="System Ready", text_color="green")
         self.status.pack(pady=10)
 
-    def get_paths(self, event_data):
+    def clean_path(self, path_str):
         """Standardizes paths from TkinterDnD (handles spaces and braces)."""
-        # This regex splits paths correctly even if they contain spaces and are wrapped in {}
-        return re.findall(r'{(.*?)}|(\S+)', event_data)
+        # Logic to remove {} often added by Linux/TkinterDnD for paths with spaces
+        paths = re.findall(r'{(.*?)}|(\S+)', path_str)
+        if not paths:
+            return path_str.strip('{}')
+        return (paths[0][0] if paths[0][0] else paths[0][1]).strip()
 
     def process_files(self, event):
-        dropped_items = []
-        for match in self.get_paths(event.data):
-            path = match[0] if match[0] else match[1]
-            dropped_items.append(path.strip('{}'))
-
-        if not dropped_items: return
-
-        # 1. Identify BAM files
-        bam_files = []
-        if os.path.isdir(dropped_items[0]):
-            import glob
-            bam_files = glob.glob(os.path.join(dropped_items[0], "*.bam"))
-            batch_name = os.path.basename(dropped_items[0])
-        else:
-            bam_files = [f for f in dropped_items if f.lower().endswith('.bam')]
-            batch_name = "manual_batch"
-
-        if not bam_files:
-            messagebox.showerror("Error", "No BAM files found.")
+        input_path = self.clean_path(event.data)
+        
+        if not os.path.isdir(input_path):
+            messagebox.showerror("Error", "Please drop the Batch FOLDER, not individual files.")
             return
 
-        # 2. GENERATE THE CSV (Matching your required format)
-        csv_path = os.path.join(os.path.dirname(__file__), "samples.csv")
-        with open(csv_path, 'w') as f:
-            f.write("sample_id,bam_path\n")
-            for bam in bam_files:
-                sample_id = os.path.basename(bam).replace(".sorted.aligned.bam", "").replace(".bam", "")
-                f.write(f"{sample_id},{os.path.abspath(bam)}\n")
-
-    def process_files2(self, event):
-        dropped_items = []
-        for match in self.get_paths(event.data):
-            path = match[0] if match[0] else match[1]
-            dropped_items.append(path.strip('{}'))
-
-        if not dropped_items: return
-
-        # 1. Identify BAM files
-        bam_files = []
-        if os.path.isdir(dropped_items[0]):
-            import glob
-            bam_files = glob.glob(os.path.join(dropped_items[0], "*.bam"))
-            batch_name = os.path.basename(dropped_items[0])
-        else:
-            bam_files = [f for f in dropped_items if f.lower().endswith('.bam')]
-            batch_name = "manual_batch"
-
-        if not bam_files:
-            messagebox.showerror("Error", "No BAM files found.")
+        # 1. Find the Lab CSV (Sample Sheet)
+        csv_files = glob.glob(os.path.join(input_path, "*.csv"))
+        if not csv_files:
+            messagebox.showerror("Missing CSV", "No .csv sample sheet found in the folder!")
             return
 
-        # 2. GENERATE THE CSV (Matching your required format)
-        csv_path = os.path.join(os.path.dirname(__file__), "samples.csv")
-        with open(csv_path, 'w') as f:
-            f.write("sample_id,bam_path\n")
-            for bam in bam_files:
-                sample_id = os.path.basename(bam).replace(".sorted.aligned.bam", "").replace(".bam", "")
-                f.write(f"{sample_id},{os.path.abspath(bam)}\n")
+        lab_csv = csv_files[0]
+        batch_name = os.path.basename(lab_csv).replace(".csv", "")
 
-        # 3. Trigger the Bash script
-        self.status.config(text=f"Running QC for {batch_name}...", fg="blue")
+        # 2. Translate Lab CSV to Nextflow CSV
         try:
-            script_path = os.path.join(os.path.dirname(__file__), 'run_qc.sh')
-            # We only need to pass the batch name now; the CSV is already saved
-            subprocess.run(['bash', script_path, batch_name], check=True)
-            messagebox.showinfo("Success", f"QC Complete for {batch_name}")
-        except subprocess.CalledProcessError:
-            messagebox.showerror("Error", "Nextflow failed.")
-            
+            df_lab = pd.read_csv(lab_csv)
+            nextflow_data = []
+
+            # Check for the 'alias' column we saw in your sample file
+            if 'alias' not in df_lab.columns:
+                messagebox.showerror("CSV Error", "CSV must contain an 'alias' column.")
+                return
+
+            for _, row in df_lab.iterrows():
+                alias = str(row['alias'])
+                # Search for any BAM file starting with the alias
+                search_pattern = os.path.join(input_path, f"{alias}*.bam")
+                found_files = glob.glob(search_pattern)
+
+                if found_files:
+                    nextflow_data.append({
+                        'sample_id': alias,
+                        'bam_path': os.path.abspath(found_files[0])
+                    })
+
+            if not nextflow_data:
+                messagebox.showerror("Matching Error", "No BAM files in the folder match the 'alias' column in your CSV.")
+                return
+
+            # 3. Save the 'trial_samples.csv' Nextflow expects
+            df_nextflow = pd.DataFrame(nextflow_data)
+            target_csv = os.path.join(os.getcwd(), "trial_samples.csv")
+            df_nextflow.to_csv(target_csv, index=False)
+
+            # 4. Trigger the Bash/Nextflow Execution
+            self.status.configure(text=f"🚀 Running QC: {batch_name}...", text_color="orange")
+            self.root.update()
+
+            script_path = os.path.join(os.getcwd(), 'run_qc.sh')
+            # This opens a NEW GNOME terminal (common on Ubuntu/ThinkPads) to run the script
+            subprocess.run(['gnome-terminal', '--wait', '--', 'bash', script_path, batch_name], check=True)
+
+            messagebox.showinfo("Success", f"QC Complete for {batch_name}!\nResults in ./results/qc/{batch_name}")
+            self.status.configure(text="✅ QC Finished", text_color="green")
+
+        except Exception as e:
+            messagebox.showerror("Pipeline Error", f"Failed to process batch:\n{str(e)}")
+            self.status.configure(text="❌ Failed", text_color="red")
 
 if __name__ == "__main__":
-    root = TkinterDnD.Tk()
+    # Initialize the special DnD-enabled window
+    root = TkinterDnD.Tk() # This is the most direct way in the new version
     app = LabApp(root)
     root.mainloop()
