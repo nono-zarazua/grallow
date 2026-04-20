@@ -88,16 +88,16 @@ class LabApp:
                 messagebox.showerror("Matching Error", "No BAM files in the folder match the 'alias' column in your CSV.")
                 return
 
-            # 3. Save the 'trial_samples.csv' Nextflow expects
+            # 3. Save the 'samples.csv' Nextflow expects
             df_nextflow = pd.DataFrame(nextflow_data)
-            target_csv = os.path.join(os.getcwd(), "trial_samples.csv")
+            target_csv = os.path.join(os.getcwd(), "samples.csv")
             df_nextflow.to_csv(target_csv, index=False)
 
             # 4. Trigger the Bash/Nextflow Execution
             self.status.configure(text=f"🚀 Running QC: {batch_name}...", text_color="orange")
             self.root.update()
 
-            script_path = os.path.join(os.getcwd(), 'run_qc.sh')
+            script_path = os.path.join(os.getcwd(), 'run_pipeline.sh')
             # This opens a NEW GNOME terminal (common on Ubuntu/ThinkPads) to run the script
             subprocess.run(['gnome-terminal', '--wait', '--', 'bash', script_path, batch_name], check=True)
 
