@@ -1,3 +1,0 @@
-sample_id,status,depth,mapped_rate,n50,mean_q,inferred_sex,sex_match,fail_reasons
-B007-04_1,PASS,0.64,85.3,3391.0,16.4,M,Match,
-B007-10_2,FAIL,1.12,93.95,4634.0,16.4,[31mU[0m,[31mMismatch (Inconclusive)[0m,Sex Mismatch (Inconclusive)
