@@ -80,7 +80,7 @@ process EVALUATE_QC {
     
     debug true 
     
-    publishDir "${params.outdir}/evaluatioin/${params.batch}", mode: 'copy'
+    publishDir "${params.outdir}/evaluation/${params.batch}", mode: 'copy'
 
     input:
     path multiqc_data_dir

@@ -4,8 +4,9 @@
 LOCAL_DIR=$1
 PROFILE="default"
 BUCKET_BASE="s3://omics-data-002313225286/clients/gtria/prod/inputs"
+INSTANCE_ID="i-080bd7f856f58d3f4"
 
-# 1. Error handling: check if user provided a folder
+# Error handling: check if user provided a folder
 if [ -z "$LOCAL_DIR" ]; then
     echo "Error: Please provide the folder path. Example: ./upload.sh ./Batch_01"
     exit 1
@@ -17,18 +18,33 @@ if ! aws sts get-caller-identity --profile $PROFILE > /dev/null 2>&1; then
     aws sso login --profile $PROFILE
 fi
 
-# 2. Extract the folder name (This becomes your BATCH_NAME)
+# Check current state
+echo "Checking status of $INSTANCE_ID..."
+CURRENT_STATE=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].State.Name' --output text)
+
+if [ "$CURRENT_STATE" != "running" ]; then
+    echo "Instance is currently $CURRENT_STATE. Starting it now..."
+    aws ec2 start-instances --instance-ids $INSTANCE_ID > /dev/null
+
+    # Wait until it is officially "Running" (State check)
+    echo "Waiting for instance to enter 'Running' state..."
+    aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+else
+    echo "Instance is already running."
+fi
+
+# Extract the folder name (This becomes your BATCH_NAME)
 BATCH_NAME=$(basename "$LOCAL_DIR")
 
 echo "--- Preparing to upload Batch: $BATCH_NAME ---"
 
-# 3. Sync to the specific Batch Folder (Archive)
+# Sync to the specific Batch Folder (Archive)
 aws s3 sync "$LOCAL_DIR" "$BUCKET_BASE/$BATCH_NAME/" \
     --profile $PROFILE \
     --exclude "*" \
     --include "*.bam"
 
-# 4. Sync to 'latest' (The Trigger for the EC2)
+# Sync to 'latest' (The Trigger for the EC2)
 # We still use a 'latest' folder so the EC2 knows what to download TODAY
 echo "Updating the 'latest' workspace for the EC2..."
 aws s3 sync "$BUCKET_BASE/$BATCH_NAME/" "s3://omics-data-002313225286/latest/" \
