@@ -1,2 +1,13 @@
 sample_id,bam_path
-B007-04_1,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260310_2/B007-04_1.sorted.aligned.bam
+sample_id,bam_path
+B020-02_1,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-02_1.sorted.aligned.bam
+B020-03_2,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-03_2.sorted.aligned.bam
+B020-04_1,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-04_1.sorted.aligned.bam
+B020-05_2,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-05_2.sorted.aligned.bam
+B020-06_1,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-06_1.sorted.aligned.bam
+B020-07_2,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-07_2.sorted.aligned.bam
+B020-08_1,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-08_1.sorted.aligned.bam
+B020-09_1,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-09_1.sorted.aligned.bam
+B020-10_2,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B020-10_2.sorted.aligned.bam
+B024-01_2,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/B024-01_2.sorted.aligned.bam
+rescued,/home/ec2-user/workdir/project-quilt-workdir/data/bams/corrida_20260417_1/rescued.sorted.aligned.bam

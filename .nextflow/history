@@ -1,2 +1,0 @@
-2026-04-20 21:49:31	3.4s	stupefied_poisson	ERR	834fcdf710f04ca3ca400fbd291996f6	64b8ba5f-3c3e-464f-96bf-73c54d3995a2	nextflow run main.nf -profile local -resume
-2026-04-20 21:52:15	17.8s	lethal_avogadro	ERR	834fcdf710f04ca3ca400fbd291996f6	64b8ba5f-3c3e-464f-96bf-73c54d3995a2	nextflow run main.nf -profile local -resume

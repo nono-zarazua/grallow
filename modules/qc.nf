@@ -1,7 +1,7 @@
 process MOSDEPTH {
     tag "$meta_id"
-    label 'process_low'
-    publishDir "${params.outdir}/qc/mosdepth/${params.batch}", mode: 'copy'
+    label 'process_high'
+    publishDir "${params.outdir}/${params.batch}/qc/mosdepth", mode: 'copy'
 
     input:
     tuple val(meta_id), path(bam), path(bai)
@@ -18,7 +18,7 @@ process MOSDEPTH {
 process FLAGSTAT {
     tag "$meta_id"
     label 'process_low'
-    publishDir "${params.outdir}/qc/flagstat/${params.batch}", mode: 'copy'
+    publishDir "${params.outdir}/${params.batch}/qc/flagstat", mode: 'copy'
 
     input:
     tuple val(meta_id), path(bam), path(bai)
@@ -35,7 +35,7 @@ process FLAGSTAT {
 process NANOPLOT {
     tag "$meta_id"
     label 'process_high'
-    publishDir "${params.outdir}/qc/nanoplot/${params.batch}", mode: 'copy'
+    publishDir "${params.outdir}/${params.batch}/qc/nanoplot", mode: 'copy'
 
     input:
     tuple val(meta_id), path(bam), path(bai)
@@ -57,7 +57,7 @@ process NANOPLOT {
 process MULTIQC {
     label 'process_low'
     // Save the final report to the main results folder
-    publishDir "${params.outdir}/multiqc/${params.batch}", mode: 'copy'
+    publishDir "${params.outdir}/${params.batch}/multiqc", mode: 'copy'
 
     input:
     // Takes a collected list of all QC files from all samples
@@ -80,7 +80,7 @@ process EVALUATE_QC {
     
     debug true 
     
-    publishDir "${params.outdir}/evaluation/${params.batch}", mode: 'copy'
+    publishDir "${params.outdir}/${params.batch}/evaluation", mode: 'copy'
 
     input:
     path multiqc_data_dir
