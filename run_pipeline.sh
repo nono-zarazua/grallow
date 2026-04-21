@@ -4,6 +4,7 @@ set -e
 cd "$(dirname "$(readlink -f "$0")")"
 
 BATCH_NAME=${1:-"trial"}
+INPUT_DIR=$2
 
 echo "======================================================"
 echo " PHASE 1: PREPROCESSING & QC (NEXTFLOW) "
@@ -22,28 +23,40 @@ echo "ACTION REQUIRED: Please review the failures and prepare your"
 echo "Snakemake input file (e.g., config/samples.tsv) with the approved samples."
 echo ""
 
-# Loop until the user explicitly types 'y' or 'yes'
 while true; do
-    read -p "Have you reviewed the QC and are you ready to launch Snakemake? (y/n): " yn
+    read -p "Have you confirmed the GUI selection? Ready to sync to AWS? (y/n): " yn
     case $yn in
         [Yy]* ) 
-            echo "QC Confirmed. Proceeding to Imputation..."
+            echo "QC Confirmed. Proceeding to AWS Upload..."
+            
+            # --- TRIGGER AWS SSO LOGIN ---
+            echo "Checking AWS SSO authentication..."
+            aws sso login
+            
+            # Format the text file into a string of --include flags
+            if [ -f "aws_includes.txt" ]; then
+                INCLUDES=$(awk '{printf "--include \"%s\" ", $0}' aws_includes.txt)
+            else
+                echo "Warning: aws_includes.txt not found. Nothing to include."
+                INCLUDES=""
+            fi
+
+            echo "Syncing $INPUT_DIR to S3..."
+            
+            # Note the order: --exclude "*" MUST come before the includes
+            eval aws s3 sync "$INPUT_DIR" s3://omics-data-002313225286/clients/gtria/prod/inputs/${BATCH_NAME} --exclude \"*\" $INCLUDES
+            
+            echo "AWS Upload Complete!"
             break
             ;;
         [Nn]* ) 
-            echo "Pipeline paused. Take your time. Type 'y' when ready."
+            echo "Upload paused. Take your time. Type 'y' when ready."
             ;;
         * ) 
             echo "Please answer y (yes) or n (no)."
             ;;
     esac
 done
-
-python3 /home/ec2-user/workdir/grallow/scripts/generate_snakemake_inputs.py \
-    --qc-csv "${OUTPUT_DIR}/evaluation/qc_summary.csv" \
-    --run-name "${OUTPUT_DIR_NAME}" \
-    --out-samples "${SAMPLES_TSV}" \
-    --out-sex "${SAMPLES_SEX_TSV}"
 
 echo ""
 echo "======================================================"

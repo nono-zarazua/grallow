@@ -23,9 +23,7 @@ class LabApp:
         self.root.title("Grallow Local QC Tool")
         self.root.geometry("550x450")
 
-        # UI Styling
-        self.label = ctk.CTkLabel(root, text="Grallow Lab QC Launcher", 
-                                  font=("Helvetica", 20, "bold"))
+        self.label = ctk.CTkLabel(root, text="Grallow Lab QC Launcher", font=("Helvetica", 20, "bold"))
         self.label.pack(pady=20)
 
         self.drop_zone = ctk.CTkLabel(root, text="\n\n[ DROP FOLDER HERE ]\n\n", 
@@ -73,8 +71,7 @@ class LabApp:
 
     def process_files(self, event):
         self.root.focus_force()
-        drop_data = event.data
-        self.root.after(100, lambda: self.execute_pipeline(drop_data))
+        self.root.after(100, lambda: self.execute_pipeline(event.data))
     
     def execute_pipeline(self, data):
         input_path = self.clean_path(data)
@@ -113,20 +110,23 @@ class LabApp:
                 messagebox.showerror("CSV Error", "CSV must contain an 'alias' column.")
                 return
 
+            missing_samples = []
             for _, row in df_lab.iterrows():
                 alias = str(row['alias'])
-                # Search for any BAM file starting with the alias
-                search_pattern = os.path.join(input_path, f"{alias}*.bam")
-                found_files = glob.glob(search_pattern)
+                bam_files = glob.glob(os.path.join(input_path, f"{alias}*.bam"))
+                bai_files = glob.glob(os.path.join(input_path, f"{alias}*.bai"))
 
-                if found_files:
-                    nextflow_data.append({
-                        'sample_id': alias,
-                        'bam_path': os.path.abspath(found_files[0])
-                    })
+                if bam_files and bai_files:
+                    nextflow_data.append({'sample_id': alias, 'bam_path': os.path.abspath(bam_files[0]), 'bai_path': os.path.abspath(bai_files[0])})
+                else:
+                    missing_samples.append(alias)
+
+            if missing_samples:
+                messagebox.showerror("Missing Files", f"Missing .bam or .bai for aliases:\n{', '.join(missing_samples)}")
+                return
 
             if not nextflow_data:
-                messagebox.showerror("Matching Error", "No BAM files in the folder match the 'alias' column in your CSV.")
+                messagebox.showerror("Matching Error", "No matching BAM files found in the folder.")
                 return
 
             # 3. Save the 'samples.csv' Nextflow expects
@@ -139,10 +139,11 @@ class LabApp:
             self.root.update()
 
             script_path = os.path.join(os.getcwd(), 'run_pipeline.sh')
-            subprocess.Popen(['gnome-terminal', '--', 'bash', script_path, batch_name])
+            # Pass BOTH the batch name and the original folder path to the bash script
+            subprocess.Popen(['gnome-terminal', '--', 'bash', script_path, batch_name, input_path])
 
             # 2. Wait for the Nextflow evaluation file to be created
-            eval_csv = os.path.join(os.getcwd(), "results", "batch_name", "evaluation", "qc_summary.csv")
+            eval_csv = os.path.join(os.getcwd(), "results", batch_name, "evaluation", "qc_summary.csv")
 
             self.status.configure(text="⏳ Processing... Window will pop when ready", text_color="orange")
             self.root.update()
@@ -167,7 +168,17 @@ class LabApp:
                 if approved_samples is None:
                     self.status.configure(text="❌ Operation Cancelled", text_color="red")
                 else:
-                    self.status.configure(text=f"✅ {len(approved_samples)} samples ready for AWS", text_color="green")
+                    # ---> CREATE EXPLICIT INCLUDE LIST FOR AWS <---
+                    include_file = os.path.join(os.getcwd(), "aws_includes.txt")
+                    with open(include_file, "w") as f:
+                        # Ensure the sample CSV is also uploaded
+                        f.write(f"*{batch_name}*.csv\n")
+                        # Add approved BAMs and BAIs
+                        for s in approved_samples:
+                            f.write(f"*{s}*.bam\n")
+                            f.write(f"*{s}*.bai\n")
+                            
+                    self.status.configure(text=f"✅ {len(approved_samples)} accepted. Ready for AWS Sync.", text_color="green")
             else:
                 messagebox.showerror("Timeout", "Nextflow took too long or failed to create the summary.")
 
