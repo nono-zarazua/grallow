@@ -1,10 +1,18 @@
 #!/bin/bash
 # Exit immediately if a command exits with a non-zero status
 set -e
+
+trap 'echo ""; read -p "Press [Enter] to close this window..."' EXIT
+
 cd "$(dirname "$(readlink -f "$0")")"
 
 BATCH_NAME=${1:-"trial"}
-INPUT_DIR=$2
+INPUT_DIR="$2"
+
+if [ -z "$INPUT_DIR" ]; then
+    echo "ERROR: INPUT_DIR ($2) is empty. Did Python pass the folder path correctly?"
+    exit 1
+fi
 
 echo "======================================================"
 echo " PHASE 1: PREPROCESSING & QC (NEXTFLOW) "
