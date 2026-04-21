@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-#!/usr/bin/env python3
-
 import tkinter as tk
 from tkinter import messagebox
 import customtkinter as ctk
@@ -48,7 +46,7 @@ class LabApp:
     def on_closing(self):
         # Stop any subprocesses or loops here if needed
         self.root.destroy()
-        os._exit(0) # Force exit background threads
+        os._exit(0)
 
     def clean_path(self, path_str):
         """Standardizes paths from TkinterDnD (handles spaces and braces)."""
@@ -58,10 +56,24 @@ class LabApp:
             return path_str.strip('{}')
         return (paths[0][0] if paths[0][0] else paths[0][1]).strip()
 
+    def update_nextflow_config(self, batch_name):
+        """Edits nextflow.config to set params.batch to the current run name."""
+        config_path = os.path.join(os.getcwd(), "nextflow.config")
+        if not os.path.exists(config_path):
+            return
+
+        with open(config_path, 'r') as f:
+            content = f.read()
+
+        # Regex replaces the value inside quotes for the 'batch' parameter
+        new_content = re.sub(r'batch\s*=\s*["\'].*?["\']', f'batch = "{batch_name}"', content)
+
+        with open(config_path, 'w') as f:
+            f.write(new_content)
+
     def process_files(self, event):
         self.root.focus_force()
         drop_data = event.data
-        
         self.root.after(100, lambda: self.execute_pipeline(drop_data))
     
     def execute_pipeline(self, data):
@@ -71,17 +83,28 @@ class LabApp:
             messagebox.showerror("Error", "Please drop the Batch FOLDER, not individual files.")
             return
 
-        # 1. Find the Lab CSV (Sample Sheet)
+        # 1. Identify Batch Name from CSV (corrida_YYYYMMDD_#)
         csv_files = glob.glob(os.path.join(input_path, "*.csv"))
-        if not csv_files:
-            messagebox.showerror("Missing CSV", "No .csv sample sheet found in the folder!")
+        corrida_pattern = re.compile(r'corrida_\d{8}_\d+')
+
+        batch_name = "trial" # Fallback
+        lab_csv = None
+
+        for f in csv_files:
+            name = os.path.basename(f)
+            if corrida_pattern.search(name):
+                batch_name = name.replace(".csv", "")
+                lab_csv = f
+                break
+
+        if not lab_csv:
+            messagebox.showerror("Missing CSV", "No 'corrida_...' sample sheet found in the folder!")
             return
 
-        lab_csv = csv_files[0]
-        batch_name = os.path.basename(lab_csv).replace(".csv", "")
-
-        # 2. Translate Lab CSV to Nextflow CSV
+        # 2. Update config and prepare samples.csv
         try:
+            self.update_nextflow_config(batch_name)
+
             df_lab = pd.read_csv(lab_csv)
             nextflow_data = []
 
@@ -116,21 +139,17 @@ class LabApp:
             self.root.update()
 
             script_path = os.path.join(os.getcwd(), 'run_pipeline.sh')
-
-            # ... inside process_files ...
-
-            # 1. Start the terminal without blocking (removed --wait and used Popen)
             subprocess.Popen(['gnome-terminal', '--', 'bash', script_path, batch_name])
 
             # 2. Wait for the Nextflow evaluation file to be created
-            eval_csv = os.path.join(os.getcwd(), "results", "corrida_trial", "trial", "evaluation", "qc_summary.csv")
+            eval_csv = os.path.join(os.getcwd(), "results", "batch_name", "evaluation", "qc_summary.csv")
 
             self.status.configure(text="⏳ Processing... Window will pop when ready", text_color="orange")
             self.root.update()
 
             # Polling loop: Wait up to 10 minutes for the file
             found = False
-            for _ in range(600): 
+            for _ in range(900):
                 if os.path.exists(eval_csv):
                     found = True
                     break
@@ -158,6 +177,6 @@ class LabApp:
 
 if __name__ == "__main__":
     # Initialize the special DnD-enabled window
-    root = TkinterDnD.Tk() # This is the most direct way in the new version
+    root = TkinterDnD.Tk()
     app = LabApp(root)
     root.mainloop()
