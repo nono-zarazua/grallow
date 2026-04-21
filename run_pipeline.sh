@@ -59,14 +59,6 @@ python3 /home/ec2-user/workdir/grallow/scripts/generate_snakemake_inputs.py \
 
 echo ""
 echo "======================================================"
-echo " PHASE 3: IMPUTATION (SNAKEMAKE) "
-echo "======================================================"
-# Trigger the Snakemake workflow 
-# (Adjust cores and conda flags to match your exact environment)
-#snakemake --cores all --sdm conda --keep-going --rerun-incomplete
-
-echo ""
-echo "======================================================"
 echo " PIPELINE COMPLETE "
 echo "======================================================"
 
