@@ -3,20 +3,13 @@
 set -e
 cd "$(dirname "$(readlink -f "$0")")"
 
-CONFIG_DIR="config"
-SAMPLES_TSV="${CONFIG_DIR}/samples.tsv"
-SAMPLES_SEX_TSV="${CONFIG_DIR}/samples-sex.tsv"
-CONFIG_YAML="${CONFIG_DIR}/config.yaml"
-
-RUN_ID="trial"
-RUN_NAME="corrida_${RUN_ID}"
-OUTPUT_DIR="results/${RUN_NAME}"
+BATCH_NAME=${1:-"trial"}
 
 echo "======================================================"
 echo " PHASE 1: PREPROCESSING & QC (NEXTFLOW) "
 echo "======================================================"
 # Run the Nextflow pipeline
-nextflow run main.nf -profile local -resume --outdir "$OUTPUT_DIR"
+nextflow run main.nf -profile local -resume --batch "$BATCH_NAME"
 
 echo ""
 echo "======================================================"
@@ -46,11 +39,6 @@ while true; do
     esac
 done
 
-echo "Updating config.yaml with run_name: ${OUTPUT_DIR_NAME}..."
-# This finds the line starting with run_name and replaces it
-sed -i 's/^run_name:.*/run_name: "'"${RUN_NAME}"'"/' "$CONFIG_YAML"
-
-echo "Generating samples.tsv and samples-sex.tsv..."
 python3 /home/ec2-user/workdir/grallow/scripts/generate_snakemake_inputs.py \
     --qc-csv "${OUTPUT_DIR}/evaluation/qc_summary.csv" \
     --run-name "${OUTPUT_DIR_NAME}" \
