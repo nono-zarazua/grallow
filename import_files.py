@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+#!/usr/bin/env python3
+
 import tkinter as tk
 from tkinter import messagebox
 import customtkinter as ctk
@@ -9,6 +11,8 @@ import os
 import re
 import pandas as pd
 import glob
+import time
+from selector import SelectionWindow
 
 # Enable CustomTkinter to work with the Drag-and-Drop wrapper
 class Tk(TkinterDnD.Tk):
@@ -47,7 +51,13 @@ class LabApp:
         return (paths[0][0] if paths[0][0] else paths[0][1]).strip()
 
     def process_files(self, event):
-        input_path = self.clean_path(event.data)
+        self.root.focus_force()
+        drop_data = event.data
+        
+        self.root.after(100, lambda: self.execute_pipeline(drop_data))
+    
+    def execute_pipeline(self, data):
+        input_path = self.clean_path(data)
         
         if not os.path.isdir(input_path):
             messagebox.showerror("Error", "Please drop the Batch FOLDER, not individual files.")
@@ -98,11 +108,41 @@ class LabApp:
             self.root.update()
 
             script_path = os.path.join(os.getcwd(), 'run_pipeline.sh')
-            # This opens a NEW GNOME terminal (common on Ubuntu/ThinkPads) to run the script
-            subprocess.run(['gnome-terminal', '--wait', '--', 'bash', script_path, batch_name], check=True)
 
-            messagebox.showinfo("Success", f"QC Complete for {batch_name}!\nResults in ./results/qc/{batch_name}")
-            self.status.configure(text="✅ QC Finished", text_color="green")
+            # ... inside process_files ...
+
+            # 1. Start the terminal without blocking (removed --wait and used Popen)
+            subprocess.Popen(['gnome-terminal', '--', 'bash', script_path, batch_name])
+
+            # 2. Wait for the Nextflow evaluation file to be created
+            eval_csv = os.path.join(os.getcwd(), "results", "evaluation", "trial", "qc_summary.csv")
+
+            self.status.configure(text="⏳ Processing... Window will pop when ready", text_color="orange")
+            self.root.update()
+
+            # Polling loop: Wait up to 10 minutes for the file
+            found = False
+            for _ in range(600): 
+                if os.path.exists(eval_csv):
+                    found = True
+                    break
+                time.sleep(1) 
+                self.root.update()
+
+            if found:
+                # 3. Load data and launch the Selection Window
+                df_eval = pd.read_csv(eval_csv)
+                selector = SelectionWindow(self.root, df_eval, batch_name)
+                self.root.wait_window(selector)
+                
+                approved_samples = selector.selected_samples
+                
+                if approved_samples is None:
+                    self.status.configure(text="❌ Operation Cancelled", text_color="red")
+                else:
+                    self.status.configure(text=f"✅ {len(approved_samples)} samples ready for AWS", text_color="green")
+            else:
+                messagebox.showerror("Timeout", "Nextflow took too long or failed to create the summary.")
 
         except Exception as e:
             messagebox.showerror("Pipeline Error", f"Failed to process batch:\n{str(e)}")
