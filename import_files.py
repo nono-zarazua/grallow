@@ -42,6 +42,14 @@ class LabApp:
         self.status = ctk.CTkLabel(root, text="System Ready", text_color="green")
         self.status.pack(pady=10)
 
+        # Add to LabApp.__init__
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        # Stop any subprocesses or loops here if needed
+        self.root.destroy()
+        os._exit(0) # Force exit background threads
+
     def clean_path(self, path_str):
         """Standardizes paths from TkinterDnD (handles spaces and braces)."""
         # Logic to remove {} often added by Linux/TkinterDnD for paths with spaces
@@ -115,7 +123,7 @@ class LabApp:
             subprocess.Popen(['gnome-terminal', '--', 'bash', script_path, batch_name])
 
             # 2. Wait for the Nextflow evaluation file to be created
-            eval_csv = os.path.join(os.getcwd(), "results", "evaluation", "trial", "qc_summary.csv")
+            eval_csv = os.path.join(os.getcwd(), "results", "corrida_trial", "trial", "evaluation", "qc_summary.csv")
 
             self.status.configure(text="⏳ Processing... Window will pop when ready", text_color="orange")
             self.root.update()
