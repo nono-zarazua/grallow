@@ -53,6 +53,11 @@ while true; do
             
             # Note the order: --exclude "*" MUST come before the includes
             eval aws s3 sync "$INPUT_DIR" s3://omics-data-002313225286/clients/gtria/prod/inputs/${BATCH_NAME} --exclude \"*\" $INCLUDES
+
+            echo "Upload finished. Sending completion trigger..."
+            touch upload_complete.txt
+            aws s3 cp upload_complete.txt s3://omics-data-002313225286/clients/gtria/prod/inputs/${BATCH_NAME}/upload_complete.txt
+            rm upload_complete.txt
             
             echo "AWS Upload Complete!"
             break
