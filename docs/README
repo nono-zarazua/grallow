@@ -8,5 +8,14 @@ Download Infinium Global Screening Array v3.0 Loci Name to rsID Conversion File
 wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/productfiles/global-screening-array-24/v3-0/infinium-global-screening-array-24-v3-0-a1-b151-rsids.zip
 
 
+Download Infinium Global Screening Array v3.0 File for UCSC Browser (BED Format)
+
+wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/productfiles/global-screening-array-24/v3-0/infinium-global-screening-array-24-v3-0-a1-bed.zip
+
+
+Download Infinium MethylationEPIC v2.0 Product Files 
+
+wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/productfiles/methylationepic/InfiniumMethylationEPICv2.0ProductFiles(ZIPFormat).zip
+
 Further support files:
 https://support.illumina.com/array/array_kits/infinium-global-screening-array/downloads.html
