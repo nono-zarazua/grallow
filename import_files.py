@@ -1,45 +1,71 @@
 #!/usr/bin/env python3
 
 import tkinter as tk
+import tkinter.ttk as ttk
+import tkinter.filedialog as fd
 from tkinter import messagebox
 import customtkinter as ctk
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import subprocess
 import os
+import sys
 import re
 import pandas as pd
 import glob
 import time
 from selector import SelectionWindow
+from guibaseclass import GuiBaseClass
 
-# Enable CustomTkinter to work with the Drag-and-Drop wrapper
-class Tk(TkinterDnD.Tk):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
-class LabApp:
+class LabApp(GuiBaseClass):
     def __init__(self, root):
-        self.root = root
-        self.root.title("Grallow Local QC Tool")
-        self.root.geometry("550x450")
+        super().__init__(root)
 
-        self.label = ctk.CTkLabel(root, text="Grallow Lab QC Launcher", font=("Helvetica", 20, "bold"))
-        self.label.pack(pady=20)
+        self.setAppTitle("Grallow Lab QC Launcher")
 
-        self.drop_zone = ctk.CTkLabel(root, text="\n\n[ DROP FOLDER HERE ]\n\n", 
-                                      width=400, height=200, fg_color="#333333",
+        root.minsize(550,450)
+
+        menu_directory = self.getMenu('Directory')
+        menu_directory.add_command(label="Open", command=self.open_directory, underline=0)
+
+        menu_help = self.getMenu('Help')
+
+        self.addStatusBar()
+        self.message("Select or drag a directory or use Directory > Open")        
+
+
+        # Place GUI's main frame
+        frame = self.getFrame()
+
+        # Add drop zone to main frame
+        self.drop_zone = ctk.CTkLabel(frame, text="\n\n[ DROP FOLDER HERE ]\n\n", 
+                                      width=400, height=200, fg_color="white",
                                       corner_radius=10)
-        self.drop_zone.pack(padx=20, pady=20)
+        self.drop_zone.pack(padx=20, pady=20, side = "top", fill = "both", expand = True)
 
-        # FIX: Register and Bind using the correct methods
+        self.select_button = ttk.Button(self.frame, text="Select Folder", command=self.open_directory)
+        self.select_button.pack(padx=10, pady=10)
+
+        self.submit_button = ttk.Button(self.frame, text="Submit", command=self.process_files)
+        self.submit_button.pack(padx=10, pady=10)
+
+        # Register and Bind using the correct methods
         self.drop_zone.drop_target_register(DND_FILES)
-        self.drop_zone.dnd_bind('<<Drop>>', self.process_files)
-
-        self.status = ctk.CTkLabel(root, text="System Ready", text_color="green")
-        self.status.pack(pady=10)
+        self.drop_zone.dnd_bind('<<Drop>>', self.handle_drop)
 
         # Add to LabApp.__init__
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        # Variables to store selected directory
+        self.selected_dir = None
+
+    def handle_drop(self, event):
+        self.selected_dir = self.clean_path(event.data)
+        self.drop_zone.configure(
+            text=f"\n\n[ Folder Loaded ]\n{self.selected_dir}\n\n",
+            text_color="green"
+        )
+        self.message(f"Ready to process: {self.selected_dir}")
 
     def on_closing(self):
         # Stop any subprocesses or loops here if needed
@@ -68,10 +94,29 @@ class LabApp:
 
         with open(config_path, 'w') as f:
             f.write(new_content)
+    
+    def open_directory(self):
+        # Opens a dialog to select a directory
+        dir_path = fd.askdirectory(title="Select a Directory")
+        if dir_path:
+            self.selected_dir = dir_path
+            # self.label.config(text=f"Selected Directory: {dir_path}")
+            self.message(f"Directory set to: {dir_path}")
 
-    def process_files(self, event):
+            self.drop_zone.configure(
+                text=f"\n\n[ FOLDER LOADED ]\n{self.selected_dir}\n\n", 
+                text_color="lightgreen"
+            )
+        else:
+            self.message("No directory selected")
+
+    def process_files(self):
+        if not self.selected_dir:
+            messagebox.showwarning("Warning", "Please drop a folder or use the menu to select one first.")
+            return
+
         self.root.focus_force()
-        self.root.after(100, lambda: self.execute_pipeline(event.data))
+        self.root.after(100, lambda: self.execute_pipeline(self.selected_dir))
     
     def execute_pipeline(self, data):
         input_path = self.clean_path(data)
@@ -87,12 +132,18 @@ class LabApp:
         batch_name = "trial" # Fallback
         lab_csv = None
 
-        for f in csv_files:
-            name = os.path.basename(f)
-            if corrida_pattern.search(name):
-                batch_name = name.replace(".csv", "")
-                lab_csv = f
-                break
+        if "sample_sheet.csv" in csv_files:
+            df_sample_sheet = pd.read_csv("sample_sheet.csv")
+            batch_name = df_sample_sheet["sample_id"][1] 
+            lab_csv = batch_name + ".csv"
+            os.system(f"mv sample_sheet.csv {lab_csv}")
+        else:
+            for f in csv_files:
+                name = os.path.basename(f)
+                if corrida_pattern.search(name):
+                    batch_name = name.replace(".csv", "")
+                    lab_csv = f
+                    break
 
         if not lab_csv:
             messagebox.showerror("Missing CSV", "No 'corrida_...' sample sheet found in the folder!")
@@ -186,8 +237,29 @@ class LabApp:
             messagebox.showerror("Pipeline Error", f"Failed to process batch:\n{str(e)}")
             self.status.configure(text="❌ Failed", text_color="red")
 
-if __name__ == "__main__":
+def main(argv):
     # Initialize the special DnD-enabled window
     root = TkinterDnD.Tk()
     app = LabApp(root)
-    root.mainloop()
+
+    if len(argv) == 1:
+        app.message("Drop a folder in the box or select via Directory > Open menu.")
+    elif len(argv) == 2:
+        # Handle argument in ""
+        match = re.match(r'^(["\'])(.*)\1$', argv[-1])
+        if match:
+            the_path = match.group(2)
+        else:
+            the_path = argv[-1]
+        abs_the_path = os.path.abspath(the_path)
+        app.selected_dir = abs_the_path
+        app.message(f"Dir: {abs_the_path}")
+    else:
+        print("Error: wrong number of arguments.")
+        sys.exit(1)
+
+
+    app.mainLoop()
+
+if __name__ == "__main__":
+    main(sys.argv)
