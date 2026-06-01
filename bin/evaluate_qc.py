@@ -108,7 +108,7 @@ class QCParser:
         final_data = []
         
         # Print header for terminal display
-        header_format = f"\n{'alias':<12} | {'Status':<6} | {'Depth':<6} | {'Map %':<6} | {'N50':<6} | {'Mean Q':<6} | {'Real Sex':<6} | {'Sex Match':<20}"
+        header_format = f"\n{'Sample':<12} | {'Status':<6} | {'Depth':<6} | {'Map %':<6} | {'N50':<6} | {'Mean Q':<6} | {'Real Sex':<6} | {'Sex Match':<20}"
         print(f"\n{header_format}")
         table_width = len(header_format) + 2
         print("-" * table_width)
@@ -165,7 +165,7 @@ class QCParser:
             print(f"{s_id:<12} | {status_str:<15} | {depth_str:<6} | {mapped_str:<6} | {n50_str:<6} | {q_str:<6} | {sex_real:<8} | {sex_str:<20}")
 
             final_data.append({
-                'sample_id': s_id,
+                'alias': s_id,
                 'status': status,
                 'depth': depth,
                 'mapped_rate': mapped,
