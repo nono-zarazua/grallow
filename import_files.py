@@ -134,11 +134,13 @@ class LabApp(GuiBaseClass):
         batch_name = "trial" # Fallback
         lab_csv = None
 
-        if "sample_sheet.csv" in csv_files:
-            df_sample_sheet = pd.read_csv("sample_sheet.csv")
-            batch_name = df_sample_sheet["sample_id"][1] 
-            lab_csv = batch_name + ".csv"
-            os.system(f"mv sample_sheet.csv {lab_csv}")
+        expected_sample_sheet = os.path.join(input_path, "sample_sheet.csv")
+
+        if expected_sample_sheet in csv_files:
+            df_sample_sheet = pd.read_csv(expected_sample_sheet)
+            batch_name = str(df_sample_sheet["sample_id"].iloc[0])
+            lab_csv = os.path.join(input_path, f"{batch_name}.csv")
+            os.rename(expected_sample_sheet, lab_csv)
         else:
             for f in csv_files:
                 name = os.path.basename(f)
