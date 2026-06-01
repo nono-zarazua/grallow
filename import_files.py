@@ -192,7 +192,7 @@ class LabApp(GuiBaseClass):
             df_nextflow.to_csv(target_csv, index=False)
 
             # 4. Trigger the Bash/Nextflow Execution
-            self.status.configure(text=f"🚀 Running QC: {batch_name}...", text_color="orange")
+            self.status.configure(text=f"🚀 Running QC: {batch_name}...", foreground="orange")
             self.root.update()
 
             script_path = os.path.join(os.getcwd(), 'run_pipeline.sh')
@@ -203,7 +203,7 @@ class LabApp(GuiBaseClass):
             eval_csv = os.path.join(os.getcwd(), "results", batch_name, "evaluation", "qc_summary.csv")
             self.summary = eval_csv
 
-            self.status.configure(text="⏳ Processing... Window will pop when ready", text_color="orange")
+            self.status.configure(text="⏳ Processing... Window will pop when ready", foreground="orange")
             self.root.update()
 
             # Polling loop: Wait up to 10 minutes for the file
@@ -224,7 +224,7 @@ class LabApp(GuiBaseClass):
                 approved_samples = selector.selected_samples
                 
                 if approved_samples is None:
-                    self.status.configure(text="❌ Operation Cancelled", text_color="red")
+                    self.status.configure(text="❌ Operation Cancelled", foreground="red")
                 else:
                     try:
                         df_lab_original = pd.read_csv(self.sample_sheet)
@@ -257,7 +257,7 @@ class LabApp(GuiBaseClass):
 
         except Exception as e:
             messagebox.showerror("Pipeline Error", f"Failed to process batch:\n{str(e)}")
-            self.status.configure(text="❌ Failed", text_color="red")
+            self.status.configure(text="❌ Failed", foreground="red")
 
 def main(argv):
     # Initialize the special DnD-enabled window
