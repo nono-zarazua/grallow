@@ -44,7 +44,7 @@ class SelectionWindow(ctk.CTkToplevel):
 
         # --- THE MISSING LOOP: Populating the samples ---
         for _, row in qc_data.iterrows():
-            s_id = row['sample_id']
+            s_id = row['alias']
             status = row['status']
             reason = row['fail_reasons'] if pd.notna(row['fail_reasons']) else ""
             
