@@ -58,6 +58,8 @@ class LabApp(GuiBaseClass):
 
         # Variables to store selected directory
         self.selected_dir = None
+        self.summary = None
+        self.sample_sheet = None
 
     def handle_drop(self, event):
         self.selected_dir = self.clean_path(event.data)
@@ -148,6 +150,8 @@ class LabApp(GuiBaseClass):
         if not lab_csv:
             messagebox.showerror("Missing CSV", "No 'corrida_...' sample sheet found in the folder!")
             return
+        else:
+            self.sample_sheet = lab_csv
 
         # 2. Update config and prepare samples.csv
         try:
@@ -195,6 +199,7 @@ class LabApp(GuiBaseClass):
 
             # 2. Wait for the Nextflow evaluation file to be created
             eval_csv = os.path.join(os.getcwd(), "results", batch_name, "evaluation", "qc_summary.csv")
+            self.summary = eval_csv
 
             self.status.configure(text="⏳ Processing... Window will pop when ready", text_color="orange")
             self.root.update()
@@ -219,11 +224,26 @@ class LabApp(GuiBaseClass):
                 if approved_samples is None:
                     self.status.configure(text="❌ Operation Cancelled", text_color="red")
                 else:
+                    try:
+                        df_lab_original = pd.read_csv(self.sample_sheet)
+
+                        merged_df = pd.merge(df_lab_original, df_eval[['alias','depth']], on='alias', how='left')
+
+                        final_df = merged_df[merged_df['alias'].isin(approved_samples)]
+
+                        aws_batch_name = "aws_sample_sheet.csv"
+                        aws_csv_path = os.path.join(input_path, aws_batch_name)
+                        final_df.to_csv(aws_csv_path, index=False)
+
+                    except Exception as e:
+                        messagebox.showerror("Merge error", f"Failed to merge depth data:\n{str(e)}")
+                        return
+
                     # ---> CREATE EXPLICIT INCLUDE LIST FOR AWS <---
                     include_file = os.path.join(os.getcwd(), "aws_includes.txt")
                     with open(include_file, "w") as f:
                         # Ensure the sample CSV is also uploaded
-                        f.write(f"*{batch_name}*.csv\n")
+                        f.write(f"*{aws_batch_name}\n")
                         # Add approved BAMs and BAIs
                         for s in approved_samples:
                             f.write(f"*{s}*.bam\n")
