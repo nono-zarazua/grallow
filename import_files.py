@@ -251,7 +251,7 @@ class LabApp(GuiBaseClass):
                             f.write(f"*{s}*.bam\n")
                             f.write(f"*{s}*.bai\n")
                             
-                    self.status.configure(text=f"✅ {len(approved_samples)} accepted. Ready for AWS Sync.", text_color="green")
+                    self.status.configure(text=f"✅ {len(approved_samples)} accepted. Ready for AWS Sync.", foreground="green")
             else:
                 messagebox.showerror("Timeout", "Nextflow took too long or failed to create the summary.")
 
